@@ -31,46 +31,90 @@
             <section class="main-content">
                 <h2>Состав</h2>
                 <p>
-                    Список членов организации дыхания Шинигами, отсортированный по рангам от высшего к низшему.
+                    Структура организации дыхания Шинигами в виде пирамиды, от высшего ранга к низшему.
                 </p>
                 
-                <div class="ranking-system">
-                    <div class="rank-card featured">
-                        <div class="rank-number">1</div>
-                        <h3>Ашерон</h3>
-                        <p class="rank-name">Столп дыхания</p>
-                        <ul class="requirements" style="list-style: none; padding-left: 0;">
-                            <li style="padding-left: 0;">Митико Гусато</li>
-                        </ul>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin: 3rem 0;">
+                    <!-- Ашерон - 1 место (верх) -->
+                    <div style="display: flex; justify-content: center; gap: 1rem;">
+                        <div class="rank-card featured" style="min-width: 250px;">
+                            <div class="rank-number">1</div>
+                            <h3>Ашерон</h3>
+                            <p class="rank-name">Столп дыхания</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Митико Гусато</p>
+                        </div>
                     </div>
 
-                    <div class="rank-card">
-                        <div class="rank-number">2</div>
-                        <h3>Дасэйдзин</h3>
-                        <p class="rank-name">Цугуко / Приёмник</p>
-                        <ul class="requirements" style="list-style: none; padding-left: 0;">
-                            <li style="padding-left: 0;">Юки Гусато</li>
-                        </ul>
+                    <!-- Дасэйдзин - 2 места -->
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="rank-card" style="min-width: 250px;">
+                            <div class="rank-number">2</div>
+                            <h3>Дасэйдзин</h3>
+                            <p class="rank-name">Цугуко / Приёмник</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Юки Гусато</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px; opacity: 0.5; border-style: dashed;">
+                            <div class="rank-number">2</div>
+                            <h3>Дасэйдзин</h3>
+                            <p class="rank-name">Цугуко / Приёмник</p>
+                            <p style="margin-top: 1rem; color: var(--text-gray);">Вакантно</p>
+                        </div>
                     </div>
 
-                    <div class="rank-card">
-                        <div class="rank-number">3</div>
-                        <h3>Датенши</h3>
-                        <p class="rank-name">Инструктор</p>
-                        <ul class="requirements" style="list-style: none; padding-left: 0;">
-                            <li style="padding-left: 0;">Rio Shintaro</li>
-                            <li style="padding-left: 0;">Rei Shintaro</li>
-                            <li style="padding-left: 0;">Haruki Shintaro</li>
-                        </ul>
+                    <!-- Датенши - 3 места -->
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="rank-card" style="min-width: 250px;">
+                            <div class="rank-number">3</div>
+                            <h3>Датенши</h3>
+                            <p class="rank-name">Инструктор</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Rio Shintaro</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px;">
+                            <div class="rank-number">3</div>
+                            <h3>Датенши</h3>
+                            <p class="rank-name">Инструктор</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Rei Shintaro</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px;">
+                            <div class="rank-number">3</div>
+                            <h3>Датенши</h3>
+                            <p class="rank-name">Инструктор</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Haruki Shintaro</p>
+                        </div>
                     </div>
 
-                    <div class="rank-card">
-                        <div class="rank-number">4</div>
-                        <h3>Гитэнши</h3>
-                        <p class="rank-name">Истребитель</p>
-                        <ul class="requirements" style="list-style: none; padding-left: 0;">
-                            <li style="padding-left: 0;">Амайя Кумагаи</li>
-                        </ul>
+                    <!-- Гитэнши - 5 мест -->
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="rank-card" style="min-width: 250px;">
+                            <div class="rank-number">4</div>
+                            <h3>Гитэнши</h3>
+                            <p class="rank-name">Истребитель</p>
+                            <p style="margin-top: 1rem; color: var(--text-light);">Амайя Кумагаи</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px; opacity: 0.5; border-style: dashed;">
+                            <div class="rank-number">4</div>
+                            <h3>Гитэнши</h3>
+                            <p class="rank-name">Истребитель</p>
+                            <p style="margin-top: 1rem; color: var(--text-gray);">Вакантно</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px; opacity: 0.5; border-style: dashed;">
+                            <div class="rank-number">4</div>
+                            <h3>Гитэнши</h3>
+                            <p class="rank-name">Истребитель</p>
+                            <p style="margin-top: 1rem; color: var(--text-gray);">Вакантно</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px; opacity: 0.5; border-style: dashed;">
+                            <div class="rank-number">4</div>
+                            <h3>Гитэнши</h3>
+                            <p class="rank-name">Истребитель</p>
+                            <p style="margin-top: 1rem; color: var(--text-gray);">Вакантно</p>
+                        </div>
+                        <div class="rank-card" style="min-width: 250px; opacity: 0.5; border-style: dashed;">
+                            <div class="rank-number">4</div>
+                            <h3>Гитэнши</h3>
+                            <p class="rank-name">Истребитель</p>
+                            <p style="margin-top: 1rem; color: var(--text-gray);">Вакантно</p>
+                        </div>
                     </div>
                 </div>
 
