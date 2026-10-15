@@ -2,8 +2,20 @@
 const SUPABASE_URL = 'ВСТАВЬТЕ_URL_ВАШЕГО_SUPABASE_ПРОЕКТА';
 const SUPABASE_ANON_KEY = 'ВСТАВЬТЕ_ANON_PUBLIC_KEY';
 const POSITIONS = {
-  shinigami: ['Ашерон', 'Дасэйдзин', 'Датенши', 'Гитенши', 'Тенши'],
-  death: ['Архангел', 'Всадник', 'Жнец', 'Вестник', 'Искуситель']
+  shinigami: [
+    'Ашерон',
+    'Дасэйдзин',
+    'Датенши',
+    'Гитенши',
+    'Тенши'
+  ],
+  death: [
+    'Архангел',
+    'Всадник',
+    'Жнец',
+    'Вестник',
+    'Искуситель'
+  ]
 };
 const RANKS = ['Mizunoto','Mizunoe','Kanoto','Kanoe','Tsuchinoto','Tsuchinoe','Hinoto','Hinoe','Kinoto','Kinoe','Hashira'];
 const DIVISIONS = { shinigami: 'Шинигами', death: 'Смерть' };
