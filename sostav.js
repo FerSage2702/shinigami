@@ -1,4 +1,5 @@
-/* Укажите URL проекта и anon/public key Supabase. service_role key в браузер не вставлять. */
+
+/* URL проекта и публичный ключ Supabase */
 const SUPABASE_URL = 'https://rnppekauytrfgropgrlz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE';
 
@@ -20,11 +21,27 @@ const POSITIONS = {
     'Искуситель'
   ]
 };
-const RANKS = ['Mizunoto','Mizunoe','Kanoto','Kanoe','Tsuchinoto','Tsuchinoe','Hinoto','Hinoe','Kinoto','Kinoe','Hashira'];
-const DIVISIONS = { shinigami: 'Шинигами', death: 'Смерть' };
+
+const RANKS = [
+  'Mizunoto', 'Mizunoe', 'Kanoto', 'Kanoe',
+  'Tsuchinoto', 'Tsuchinoe', 'Hinoto', 'Hinoe',
+  'Kinoto', 'Kinoe', 'Hashira'
+];
+
+const DIVISIONS = {
+  shinigami: 'Шинигами',
+  death: 'Смерть'
+};
+
 const POSITION_ORDER = POSITIONS;
-let supabaseClient = null, membersCache = [], adminPassword = null, editingId = null, currentDivision = 'shinigami';
+
+let supabaseClient = null;
+let membersCache = [];
+let adminPassword = null;
+let editingId = null;
+
 const $ = (id) => document.getElementById(id);
+
 async function callManageFunction(action, extra = {}) {
   const response = await fetch(MANAGE_FUNCTION_URL, {
     method: 'POST',
@@ -48,19 +65,48 @@ async function callManageFunction(action, extra = {}) {
 
   return result;
 }
-const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+
 function setupSelects() {
-  const div=$('member-division'), pos=$('member-position');
-  function fill(){ pos.innerHTML=POSITIONS[div.value].map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(''); }
-  $('member-rank').innerHTML=RANKS.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
-  div.addEventListener('change',fill); fill();
+  const div = $('member-division');
+  const pos = $('member-position');
+
+  function fill() {
+    pos.innerHTML = POSITIONS[div.value]
+      .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
+      .join('');
+  }
+
+  $('member-rank').innerHTML = RANKS
+    .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
+    .join('');
+
+  div.addEventListener('change', fill);
+  fill();
 }
-function updateAdminUI(){
-  $('admin-status').textContent=adminPassword?'Режим редактирования включён':'Режим просмотра';
-  $('admin-login').hidden=!!adminPassword; $('admin-logout').hidden=!adminPassword;
-  document.querySelectorAll('[data-open-form]').forEach(b=>b.hidden=!adminPassword);
+
+function updateAdminUI() {
+  $('admin-status').textContent = adminPassword
+    ? 'Режим редактирования включён'
+    : 'Режим просмотра';
+
+  $('admin-login').hidden = !!adminPassword;
+  $('admin-logout').hidden = !adminPassword;
+
+  document.querySelectorAll('[data-open-form]')
+    .forEach(b => b.hidden = !adminPassword);
+
   renderAll();
 }
+
 async function loginAdmin() {
   if (!supabaseClient) {
     alert('Не настроено подключение к Supabase.');
@@ -77,6 +123,7 @@ async function loginAdmin() {
     updateAdminUI();
   } catch (error) {
     adminPassword = null;
+
     alert(
       error.message.includes('Incorrect password')
         ? 'Неверный пароль.'
@@ -84,39 +131,188 @@ async function loginAdmin() {
     );
   }
 }
-function logoutAdmin(){adminPassword=null; updateAdminUI();}
-function openModal(division, member=null){
-  if(!adminPassword){alert('Сначала войдите в режим редактирования.');return;}
-  $('member-form').reset(); editingId=member?.id ?? null;
-  $('member-division').value=member?.division || division; $('member-division').dispatchEvent(new Event('change'));
-  if(member){ $('member-name').value=member.name||''; $('member-position').value=member.position; $('member-rank').value=member.rank; $('member-steam').value=member.steam_id||''; $('member-breathing').value=member.breathing||''; }
-  $('form-title').textContent=editingId?'Изменение участника':'Добавление в состав';
-  $('save-member').textContent=editingId?'Сохранить изменения':'Сохранить участника';
-  $('form-error').hidden=true; $('member-modal').hidden=false; document.body.style.overflow='hidden'; $('member-name').focus();
+
+function logoutAdmin() {
+  adminPassword = null;
+  updateAdminUI();
 }
-function closeModal(){ $('member-modal').hidden=true; document.body.style.overflow=''; editingId=null; }
-function renderDivision(division){
-  const target=$(division==='shinigami'?'shinigami-groups':'death-groups');
-  const members=membersCache.filter(m=>m.division===division);
-  target.innerHTML=POSITION_ORDER[division].map(position=>{
-    const group=members.filter(m=>m.position===position).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
-    const rows=group.length?group.map(m=>`<tr><td><strong>${escapeHtml(m.name)}</strong></td><td><span class="rank-chip">${escapeHtml(m.rank)}</span></td><td>${m.steam_id?escapeHtml(m.steam_id):'—'}</td><td>${m.breathing?escapeHtml(m.breathing):'—'}</td>${adminPassword?`<td class="admin-actions"><button type="button" class="secondary-button" data-edit-id="${m.id}">Изменить</button><button type="button" class="secondary-button danger-button" data-delete-id="${m.id}">Удалить</button></td>`:''}</tr>`).join(''):`<tr><td class="empty-row" colspan="${adminPassword?5:4}">В этой должности пока нет участников</td></tr>`;
-    return `<section class="position-group"><h3 class="position-title"><span>${escapeHtml(position)}</span><small>${group.length}</small></h3><div class="table-scroll"><table class="roster-table"><thead><tr><th>Имя</th><th>Ранг</th><th>Steam ID</th><th>Дыхание</th>${adminPassword?'<th>Действия</th>':''}</tr></thead><tbody>${rows}</tbody></table></div></section>`;
+
+function openModal(division, member = null) {
+  if (!adminPassword) {
+    alert('Сначала войдите в режим редактирования.');
+    return;
+  }
+
+  $('member-form').reset();
+  editingId = member?.id ?? null;
+
+  $('member-division').value = member?.division || division;
+  $('member-division').dispatchEvent(new Event('change'));
+
+  if (member) {
+    $('member-name').value = member.name || '';
+    $('member-position').value = member.position;
+    $('member-rank').value = member.rank;
+    $('member-steam').value = member.steam_id || '';
+  }
+
+  $('form-title').textContent = editingId
+    ? 'Изменение участника'
+    : 'Добавление в состав';
+
+  $('save-member').textContent = editingId
+    ? 'Сохранить изменения'
+    : 'Сохранить участника';
+
+  $('form-error').hidden = true;
+  $('member-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('member-name').focus();
+}
+
+function closeModal() {
+  $('member-modal').hidden = true;
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+function renderDivision(division) {
+  const target = $(
+    division === 'shinigami'
+      ? 'shinigami-groups'
+      : 'death-groups'
+  );
+
+  const members = membersCache.filter(
+    m => m.division === division
+  );
+
+  target.innerHTML = POSITION_ORDER[division].map(position => {
+    const group = members
+      .filter(m => m.position === position)
+      .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+    const rows = group.length
+      ? group.map(m => `
+          <tr>
+            <td><strong>${escapeHtml(m.name)}</strong></td>
+            <td><span class="rank-chip">${escapeHtml(m.rank)}</span></td>
+            <td>${m.steam_id ? escapeHtml(m.steam_id) : '—'}</td>
+            ${adminPassword ? `
+              <td class="admin-actions">
+                <button type="button" class="secondary-button" data-edit-id="${m.id}">Изменить</button>
+                <button type="button" class="secondary-button danger-button" data-delete-id="${m.id}">Удалить</button>
+              </td>
+            ` : ''}
+          </tr>
+        `).join('')
+      : `
+          <tr>
+            <td class="empty-row" colspan="${adminPassword ? 4 : 3}">
+              В этой должности пока нет участников
+            </td>
+          </tr>
+        `;
+
+    return `
+      <section class="position-group">
+        <h3 class="position-title">
+          <span>${escapeHtml(position)}</span>
+          <small>${group.length}</small>
+        </h3>
+        <div class="table-scroll">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Ранг</th>
+                <th>Steam ID</th>
+                ${adminPassword ? '<th>Действия</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </section>
+    `;
   }).join('');
-  $(division==='shinigami'?'shinigami-count':'death-count').textContent=members.length;
-  $(division==='shinigami'?'shinigami-section-count':'death-section-count').textContent=`${members.length} ${pluralize(members.length,'участник','участника','участников')}`;
+
+  $(division === 'shinigami' ? 'shinigami-count' : 'death-count')
+    .textContent = members.length;
+
+  $(
+    division === 'shinigami'
+      ? 'shinigami-section-count'
+      : 'death-section-count'
+  ).textContent =
+    `${members.length} ${pluralize(members.length, 'участник', 'участника', 'участников')}`;
 }
-function pluralize(n,one,few,many){const a=n%10,b=n%100;return a===1&&b!==11?one:a>=2&&a<=4&&(b<12||b>14)?few:many;}
-function renderAll(){renderDivision('shinigami');renderDivision('death');$('total-count').textContent=membersCache.length;}
-async function loadMembers(){
-  if(!supabaseClient){$('status-message').textContent='Добавьте URL и anon/public key Supabase в файл sostav.js, чтобы загрузить состав.';$('status-message').classList.add('error');membersCache=[];renderAll();return;}
-  $('status-message').textContent='Загрузка состава…';$('status-message').classList.remove('error');
-  const {data,error}=await supabaseClient.from('members').select('id,name,division,position,rank,steam_id,breathing,created_at').order('created_at',{ascending:true});
-  if(error){$('status-message').textContent=`Не удалось загрузить состав: ${error.message}. Проверьте SQL и политики доступа.`;$('status-message').classList.add('error');membersCache=[];}
-  else{membersCache=data||[];$('status-message').textContent=membersCache.length?'Состав успешно загружен из Supabase.':'Состав пока пуст.';}
+
+function pluralize(n, one, few, many) {
+  const a = n % 10;
+  const b = n % 100;
+
+  return a === 1 && b !== 11
+    ? one
+    : a >= 2 && a <= 4 && (b < 12 || b > 14)
+      ? few
+      : many;
+}
+
+function renderAll() {
+  renderDivision('shinigami');
+  renderDivision('death');
+  $('total-count').textContent = membersCache.length;
+}
+
+async function loadMembers() {
+  if (!supabaseClient) {
+    $('status-message').textContent =
+      'Добавьте URL и anon/public key Supabase в файл sostav.js, чтобы загрузить состав.';
+
+    $('status-message').classList.add('error');
+    membersCache = [];
+    renderAll();
+    return;
+  }
+
+  $('status-message').textContent = 'Загрузка состава…';
+  $('status-message').classList.remove('error');
+
+  const { data, error } = await supabaseClient
+    .from('members')
+    .select('id,name,division,position,rank,steam_id,created_at')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    $('status-message').textContent =
+      `Не удалось загрузить состав: ${error.message}. Проверьте SQL и политики доступа.`;
+
+    $('status-message').classList.add('error');
+    membersCache = [];
+  } else {
+    membersCache = data || [];
+
+    $('status-message').textContent = membersCache.length
+      ? 'Состав успешно загружен из Supabase.'
+      : 'Состав пока пуст.';
+  }
+
   renderAll();
 }
-function payloadFromForm(){const f=new FormData($('member-form'));return {name:String(f.get('name')||'').trim(),division:String(f.get('division')||''),position:String(f.get('position')||''),rank:String(f.get('rank')||''),steam_id:String(f.get('steam_id')||'').trim()||null,breathing:String(f.get('breathing')||'').trim()||null};}
+
+function payloadFromForm() {
+  const f = new FormData($('member-form'));
+
+  return {
+    name: String(f.get('name') || '').trim(),
+    division: String(f.get('division') || ''),
+    position: String(f.get('position') || ''),
+    rank: String(f.get('rank') || ''),
+    steam_id: String(f.get('steam_id') || '').trim() || null
+  };
+}
+
 async function saveMember(event) {
   event.preventDefault();
 
@@ -154,6 +350,7 @@ async function saveMember(event) {
   } catch (error) {
     $('form-error').textContent =
       `Не удалось сохранить: ${error.message}`;
+
     $('form-error').hidden = false;
   } finally {
     btn.disabled = false;
@@ -190,22 +387,55 @@ async function deleteMember(id) {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  setupSelects();
 
-document.addEventListener('DOMContentLoaded',()=>{
-  setupSelects();document.querySelectorAll('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.openForm)));
-  $('admin-login').addEventListener('click',loginAdmin);$('admin-logout').addEventListener('click',logoutAdmin);
-  $('close-modal').addEventListener('click',closeModal);$('cancel-form').addEventListener('click',closeModal);$('member-form').addEventListener('submit',saveMember);
-  $('member-modal').addEventListener('click',e=>{if(e.target===$('member-modal'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('member-modal').hidden)closeModal();});
-  document.body.addEventListener('click',e=>{const edit=e.target.closest('[data-edit-id]');const del=e.target.closest('[data-delete-id]');if(edit){const m=membersCache.find(x=>String(x.id)===edit.dataset.editId);if(m)openModal(m.division,m);}if(del)deleteMember(del.dataset.deleteId);});
-  if (
-  window.supabase &&
-  SUPABASE_URL === 'https://rnppekauytrfgropgrlz.supabase.co' &&
-  SUPABASE_ANON_KEY === 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
-) {
-  supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
+  document.querySelectorAll('[data-open-form]').forEach(b =>
+    b.addEventListener('click', () => openModal(b.dataset.openForm))
   );
-}
-  updateAdminUI();loadMembers();
+
+  $('admin-login').addEventListener('click', loginAdmin);
+  $('admin-logout').addEventListener('click', logoutAdmin);
+  $('close-modal').addEventListener('click', closeModal);
+  $('cancel-form').addEventListener('click', closeModal);
+  $('member-form').addEventListener('submit', saveMember);
+
+  $('member-modal').addEventListener('click', e => {
+    if (e.target === $('member-modal')) closeModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('member-modal').hidden) {
+      closeModal();
+    }
+  });
+
+  document.body.addEventListener('click', e => {
+    const edit = e.target.closest('[data-edit-id]');
+    const del = e.target.closest('[data-delete-id]');
+
+    if (edit) {
+      const m = membersCache.find(
+        x => String(x.id) === edit.dataset.editId
+      );
+
+      if (m) openModal(m.division, m);
+    }
+
+    if (del) deleteMember(del.dataset.deleteId);
+  });
+
+  if (
+    window.supabase &&
+    SUPABASE_URL === 'https://rnppekauytrfgropgrlz.supabase.co' &&
+    SUPABASE_ANON_KEY === 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
+  ) {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+  }
+
+  updateAdminUI();
+  loadMembers();
 });
