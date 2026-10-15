@@ -1,7 +1,9 @@
 /* Укажите URL проекта и anon/public key Supabase. service_role key в браузер не вставлять. */
 const SUPABASE_URL = 'https://rnppekauytrfgropgrlz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE';
-const MANAGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/manage-members`;
+
+const MANAGE_FUNCTION_URL = 'https://rnppekauytrfgropgrlz.supabase.co/functions/v1/manage-members';
+
 const POSITIONS = {
   shinigami: [
     'Ашерон',
