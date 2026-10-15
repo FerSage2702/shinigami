@@ -1,6 +1,7 @@
 /* Укажите URL проекта и anon/public key Supabase. service_role key в браузер не вставлять. */
-const SUPABASE_URL = 'ВСТАВЬТЕ_URL_ВАШЕГО_SUPABASE_ПРОЕКТА';
-const SUPABASE_ANON_KEY = 'ВСТАВЬТЕ_ANON_PUBLIC_KEY';
+const SUPABASE_URL = 'https://rnppekauytrfgropgrlz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE';
+const MANAGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/manage-members`;
 const POSITIONS = {
   shinigami: [
     'Ашерон',
@@ -22,6 +23,29 @@ const DIVISIONS = { shinigami: 'Шинигами', death: 'Смерть' };
 const POSITION_ORDER = POSITIONS;
 let supabaseClient = null, membersCache = [], adminPassword = null, editingId = null, currentDivision = 'shinigami';
 const $ = (id) => document.getElementById(id);
+async function callManageFunction(action, extra = {}) {
+  const response = await fetch(MANAGE_FUNCTION_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+    },
+    body: JSON.stringify({
+      action,
+      password: adminPassword,
+      ...extra
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || 'Ошибка серверной функции');
+  }
+
+  return result;
+}
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function setupSelects() {
   const div=$('member-division'), pos=$('member-position');
@@ -35,13 +59,28 @@ function updateAdminUI(){
   document.querySelectorAll('[data-open-form]').forEach(b=>b.hidden=!adminPassword);
   renderAll();
 }
-async function loginAdmin(){
-  if(!supabaseClient){alert('Сначала настройте Supabase в sostav.js.');return;}
-  const pass=prompt('Введите пароль администратора:'); if(pass===null)return;
-  const {data,error}=await supabaseClient.rpc('check_roster_admin_password',{p_password:pass});
-  if(error){alert('Не удалось проверить пароль. Проверьте, что выполнили обновлённый supabase.sql.');return;}
-  if(data!==true){alert('Неверный пароль.');return;}
-  adminPassword=pass; updateAdminUI();
+async function loginAdmin() {
+  if (!supabaseClient) {
+    alert('Не настроено подключение к Supabase.');
+    return;
+  }
+
+  const pass = prompt('Введите пароль администратора:');
+  if (pass === null) return;
+
+  adminPassword = pass;
+
+  try {
+    await callManageFunction('check');
+    updateAdminUI();
+  } catch (error) {
+    adminPassword = null;
+    alert(
+      error.message.includes('Incorrect password')
+        ? 'Неверный пароль.'
+        : `Не удалось войти: ${error.message}`
+    );
+  }
 }
 function logoutAdmin(){adminPassword=null; updateAdminUI();}
 function openModal(division, member=null){
@@ -76,18 +115,77 @@ async function loadMembers(){
   renderAll();
 }
 function payloadFromForm(){const f=new FormData($('member-form'));return {name:String(f.get('name')||'').trim(),division:String(f.get('division')||''),position:String(f.get('position')||''),rank:String(f.get('rank')||''),steam_id:String(f.get('steam_id')||'').trim()||null,breathing:String(f.get('breathing')||'').trim()||null};}
-async function saveMember(event){
-  event.preventDefault(); if(!adminPassword){$('form-error').textContent='Войдите в режим редактирования.';$('form-error').hidden=false;return;}
-  const p=payloadFromForm();if(!p.name)return;const btn=$('save-member');btn.disabled=true;btn.textContent='Сохранение…';$('form-error').hidden=true;
-  const args={p_password:adminPassword,p_name:p.name,p_division:p.division,p_position:p.position,p_rank:p.rank,p_steam_id:p.steam_id,p_breathing:p.breathing};
-  const result=editingId?await supabaseClient.rpc('update_member_with_password',{...args,p_id:editingId}):await supabaseClient.rpc('add_member_with_password',args);
-  btn.disabled=false;btn.textContent=editingId?'Сохранить изменения':'Сохранить участника';
-  if(result.error){$('form-error').textContent=`Не удалось сохранить: ${result.error.message}`;$('form-error').hidden=false;return;}
-  closeModal();await loadMembers();
+async function saveMember(event) {
+  event.preventDefault();
+
+  if (!adminPassword) {
+    $('form-error').textContent = 'Войдите в режим редактирования.';
+    $('form-error').hidden = false;
+    return;
+  }
+
+  const member = payloadFromForm();
+
+  if (!member.name) {
+    $('form-error').textContent = 'Введите имя участника.';
+    $('form-error').hidden = false;
+    return;
+  }
+
+  const btn = $('save-member');
+  const isEditing = editingId !== null;
+
+  btn.disabled = true;
+  btn.textContent = 'Сохранение…';
+  $('form-error').hidden = true;
+
+  try {
+    await callManageFunction(
+      isEditing ? 'update' : 'create',
+      isEditing
+        ? { id: Number(editingId), member }
+        : { member }
+    );
+
+    closeModal();
+    await loadMembers();
+  } catch (error) {
+    $('form-error').textContent =
+      `Не удалось сохранить: ${error.message}`;
+    $('form-error').hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingId
+      ? 'Сохранить изменения'
+      : 'Сохранить участника';
+  }
 }
 async function deleteMember(id){if(!adminPassword)return;const member=membersCache.find(m=>String(m.id)===String(id));if(!member||!confirm(`Удалить участника «${member.name}»?`))return;
-  const {error}=await supabaseClient.rpc('delete_member_with_password',{p_password:adminPassword,p_id:id});
-  if(error){alert(`Не удалось удалить участника: ${error.message}`);return;}await loadMembers();
+  async function deleteMember(id) {
+  if (!adminPassword) {
+    alert('Сначала войдите в редактор.');
+    return;
+  }
+
+  const member = membersCache.find(
+    m => String(m.id) === String(id)
+  );
+
+  if (!member) return;
+
+  if (!confirm(`Удалить участника «${member.name}»?`)) {
+    return;
+  }
+
+  try {
+    await callManageFunction('delete', {
+      id: Number(id)
+    });
+
+    await loadMembers();
+  } catch (error) {
+    alert(`Не удалось удалить участника: ${error.message}`);
+  }
 }
 document.addEventListener('DOMContentLoaded',()=>{
   setupSelects();document.querySelectorAll('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.openForm)));
@@ -95,6 +193,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('close-modal').addEventListener('click',closeModal);$('cancel-form').addEventListener('click',closeModal);$('member-form').addEventListener('submit',saveMember);
   $('member-modal').addEventListener('click',e=>{if(e.target===$('member-modal'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('member-modal').hidden)closeModal();});
   document.body.addEventListener('click',e=>{const edit=e.target.closest('[data-edit-id]');const del=e.target.closest('[data-delete-id]');if(edit){const m=membersCache.find(x=>String(x.id)===edit.dataset.editId);if(m)openModal(m.division,m);}if(del)deleteMember(del.dataset.deleteId);});
-  if(window.supabase&&SUPABASE_URL.startsWith('https://rnppekauytrfgropgrlz.supabase.co')&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.startsWith('sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'))supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  if (
+  window.supabase &&
+  SUPABASE_URL === 'https://rnppekauytrfgropgrlz.supabase.co' &&
+  SUPABASE_ANON_KEY === 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
+) {
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+}
   updateAdminUI();loadMembers();
 });
