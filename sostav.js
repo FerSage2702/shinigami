@@ -160,8 +160,8 @@ async function saveMember(event) {
       : 'Сохранить участника';
   }
 }
-async function deleteMember(id){if(!adminPassword)return;const member=membersCache.find(m=>String(m.id)===String(id));if(!member||!confirm(`Удалить участника «${member.name}»?`))return;
-  async function deleteMember(id) {
+
+async function deleteMember(id) {
   if (!adminPassword) {
     alert('Сначала войдите в редактор.');
     return;
@@ -187,6 +187,8 @@ async function deleteMember(id){if(!adminPassword)return;const member=membersCac
     alert(`Не удалось удалить участника: ${error.message}`);
   }
 }
+
+
 document.addEventListener('DOMContentLoaded',()=>{
   setupSelects();document.querySelectorAll('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.openForm)));
   $('admin-login').addEventListener('click',loginAdmin);$('admin-logout').addEventListener('click',logoutAdmin);
