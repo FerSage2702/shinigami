@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Состав — Дыхание Шинигами и Смерти</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sostav.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <h2>死呼吸</h2>
+        <span>Дыхание Шинигами и Дыхание Смерти</span>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="sistema.html">Система повышения</a></li>
+        <li><a href="sostav.html" class="active">Состав</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="roster-main">
+    <section class="roster-hero">
+      <p class="eyebrow">死呼吸 · ИЕРАРХИЯ</p>
+      <h1>Состав организации</h1>
+      <p class="subtitle">Участники, должности и ранги двух направлений</p>
+      <div class="roster-stats">
+        <div class="stat-card"><span id="shinigami-count">—</span><small>Шинигами</small></div>
+        <div class="stat-card"><span id="death-count">—</span><small>Смерть</small></div>
+        <div class="stat-card"><span id="total-count">—</span><small>Всего участников</small></div>
+      </div>
+    </section>
+
+    <div id="status-message" class="status-message" role="status" aria-live="polite">Загрузка состава…</div>
+
+    <section class="roster-section" aria-labelledby="shinigami-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">ПЕРВОЕ НАПРАВЛЕНИЕ</p><h2 id="shinigami-title">☯ Шинигами</h2></div>
+        <span class="section-count" id="shinigami-section-count">0 участников</span>
+      </div>
+      <div id="shinigami-groups" class="position-groups"></div>
+      <div class="add-panel">
+        <div><h3>Добавить участника</h3><p>Заполни данные и выбери должность и ранг.</p></div>
+        <button type="button" class="primary-button" data-open-form="shinigami">＋ Добавить в Шинигами</button>
+      </div>
+    </section>
+
+    <section class="roster-section death-section" aria-labelledby="death-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">ВТОРОЕ НАПРАВЛЕНИЕ</p><h2 id="death-title">☠ Смерть</h2></div>
+        <span class="section-count" id="death-section-count">0 участников</span>
+      </div>
+      <div id="death-groups" class="position-groups"></div>
+      <div class="add-panel">
+        <div><h3>Добавить участника</h3><p>Заполни данные и выбери должность и ранг.</p></div>
+        <button type="button" class="primary-button" data-open-form="death">＋ Добавить в Смерть</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="member-modal" hidden>
+    <section class="member-modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
+      <button type="button" class="modal-close" id="close-modal" aria-label="Закрыть форму">×</button>
+      <p class="eyebrow">НОВЫЙ УЧАСТНИК</p>
+      <h2 id="form-title">Добавление в состав</h2>
+      <p class="modal-description">Поля со звёздочкой обязательны для заполнения.</p>
+      <form id="member-form">
+        <label for="member-name">Имя <span>*</span></label>
+        <input id="member-name" name="name" maxlength="80" required placeholder="Имя участника">
+
+        <label for="member-division">Направление <span>*</span></label>
+        <select id="member-division" name="division" required>
+          <option value="shinigami">Шинигами</option>
+          <option value="death">Смерть</option>
+        </select>
+
+        <label for="member-position">Должность <span>*</span></label>
+        <select id="member-position" name="position" required></select>
+
+        <label for="member-rank">Ранг <span>*</span></label>
+        <select id="member-rank" name="rank" required></select>
+
+        <label for="member-steam">Steam ID</label>
+        <input id="member-steam" name="steam_id" maxlength="100" placeholder="SteamID / ссылка на профиль">
+
+        <label for="member-breathing">Дыхание</label>
+        <input id="member-breathing" name="breathing" maxlength="100" placeholder="Например, Дыхание Тени">
+
+        <p id="form-error" class="form-error" hidden></p>
+        <div class="form-actions">
+          <button type="button" class="secondary-button" id="cancel-form">Отмена</button>
+          <button type="submit" class="primary-button" id="save-member">Сохранить участника</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Дыхание Шинигами / Смерти.</p>
+      <p class="footer-subtitle">死呼吸 — Путь между мирами</p>
+    </div>
+  </footer>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="sostav.js"></script>
+</body>
+</html>
