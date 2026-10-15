@@ -95,6 +95,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('close-modal').addEventListener('click',closeModal);$('cancel-form').addEventListener('click',closeModal);$('member-form').addEventListener('submit',saveMember);
   $('member-modal').addEventListener('click',e=>{if(e.target===$('member-modal'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('member-modal').hidden)closeModal();});
   document.body.addEventListener('click',e=>{const edit=e.target.closest('[data-edit-id]');const del=e.target.closest('[data-delete-id]');if(edit){const m=membersCache.find(x=>String(x.id)===edit.dataset.editId);if(m)openModal(m.division,m);}if(del)deleteMember(del.dataset.deleteId);});
-  if(window.supabase&&SUPABASE_URL.startsWith('https://rnppekauytrfgropgrlz')&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.startsWith('sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'))supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  if(window.supabase&&SUPABASE_URL.startsWith('https://rnppekauytrfgropgrlz.supabase.co/rest/v1/members')&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.startsWith('sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'))supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   updateAdminUI();loadMembers();
 });
