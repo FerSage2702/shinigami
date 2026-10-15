@@ -65,3 +65,81 @@
 .admin-actions .secondary-button { padding:7px 10px; margin:2px; font-size:.82rem; }
 .danger-button { color:#fecaca; background:rgba(220,38,38,.18); }
 .roster-table { min-width:720px; }
+
+
+
+/* Ровное выравнивание таблиц состава */
+.roster-table {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+/* Единые отступы и выравнивание содержимого */
+.roster-table th,
+.roster-table td {
+  padding: 14px 12px;
+  text-align: center;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+/* Ширина колонок в режиме просмотра */
+.roster-table th:nth-child(1),
+.roster-table td:nth-child(1) {
+  width: 30%;
+}
+
+.roster-table th:nth-child(2),
+.roster-table td:nth-child(2) {
+  width: 20%;
+}
+
+.roster-table th:nth-child(3),
+.roster-table td:nth-child(3) {
+  width: 25%;
+}
+
+/* В режиме администратора появляется колонка действий */
+.roster-table th:nth-child(4),
+.roster-table td:nth-child(4) {
+  width: 25%;
+}
+
+/* Кнопки редактирования и удаления */
+.roster-table .admin-actions {
+  white-space: normal;
+  text-align: center;
+}
+
+.roster-table .admin-actions .secondary-button {
+  display: inline-block;
+  margin: 3px;
+  vertical-align: middle;
+}
+
+/* Ранг всегда располагается по центру */
+.roster-table .rank-chip {
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Сообщение об отсутствии участников */
+.roster-table .empty-row {
+  text-align: center;
+  padding: 22px 12px !important;
+}
+
+/* Горизонтальная прокрутка на небольших экранах */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
