@@ -23,7 +23,7 @@ const POSITIONS = {
 };
 
 const RANKS = [
-  'Seito','Midzunoto', 'Midzunoe', 'Kanoto', 'Kanoe',
+  'Seito', 'Midzunoto', 'Midzunoe', 'Kanoto', 'Kanoe',
   'Tsuchinoto', 'Tsuchinoe', 'Hinoto', 'Hinoe',
   'Kinoto', 'Kinoe', 'Hashira'
 ];
