@@ -411,9 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('cancel-form').addEventListener('click', closeModal);
   $('member-form').addEventListener('submit', saveMember);
 
-  $('member-modal').addEventListener('click', e => {
-    if (e.target === $('member-modal')) closeModal();
-  });
+
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !$('member-modal').hidden) {
