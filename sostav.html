@@ -81,11 +81,29 @@
         <label for="member-position">Должность <span>*</span></label>
         <select id="member-position" name="position" required></select>
 
-        <label for="member-rank">Ранг <span>*</span></label>
-        <select id="member-rank" name="rank" required></select>
+        
+<label for="member-rank">Ранг <span>*</span></label>
+<select id="member-rank" name="rank" required></select>
 
-        <label for="member-steam">Steam ID</label>
-        <input id="member-steam" name="steam_id" maxlength="100" placeholder="SteamID / ссылка на профиль">
+<label for="member-souls">Души <span>*</span></label>
+<input
+  id="member-souls"
+  name="souls"
+  type="number"
+  min="0"
+  step="1"
+  value="0"
+  required
+>
+
+<label for="member-steam">Steam ID</label>
+<input
+  id="member-steam"
+  name="steam_id"
+  maxlength="100"
+  placeholder="SteamID / ссылка на профиль"
+>
+
 
 
         <p id="form-error" class="form-error" hidden></p>
