@@ -144,6 +144,7 @@ function openModal(division, member = null) {
   }
 
   $('member-form').reset();
+  $('member-souls').value = member?.souls ?? 0;
   editingId = member?.id ?? null;
 
   $('member-division').value = member?.division || division;
@@ -154,6 +155,7 @@ function openModal(division, member = null) {
     $('member-position').value = member.position;
     $('member-rank').value = member.rank;
     $('member-steam').value = member.steam_id || '';
+    $('member-souls').value = member.souls ?? 0;
   }
 
   $('form-title').textContent = editingId
@@ -197,6 +199,7 @@ function renderDivision(division) {
           <tr>
             <td><strong>${escapeHtml(m.name)}</strong></td>
             <td><span class="rank-chip">${escapeHtml(m.rank)}</span></td>
+            <td>${Number(m.souls ?? 0)}</td>
             <td>${m.steam_id ? escapeHtml(m.steam_id) : '—'}</td>
             ${adminPassword ? `
               <td class="admin-actions">
@@ -218,14 +221,15 @@ function renderDivision(division) {
       <section class="position-group">
         <h3 class="position-title">
           <span>${escapeHtml(position)}</span>
-          <small>${group.length}</small>
+          <small>${group.leng}</small>
         </h3>
         <div class="table-scroll">
           <table class="roster-table">
-            <thead>
+            <ead>
               <tr>
-                <th>Имя</th>
+                <>Имя</th>
                 <th>Ранг</th>
+                <th>Души</th>
                 <th>Steam ID</th>
                 ${adminPassword ? '<th>Действия</th>' : ''}
               </tr>
@@ -281,7 +285,7 @@ async function loadMembers() {
 
   const { data, error } = await supabaseClient
     .from('members')
-    .select('id,name,division,position,rank,steam_id,created_at')
+    .select('id,name,division,position,rank,souls,steam_id,created_at')
     .order('created_at', { ascending: true });
 
   if (error) {
@@ -309,6 +313,7 @@ function payloadFromForm() {
     division: String(f.get('division') || ''),
     position: String(f.get('position') || ''),
     rank: String(f.get('rank') || ''),
+    souls: Number(f.get('souls') || 0),
     steam_id: String(f.get('steam_id') || '').trim() || null
   };
 }
@@ -323,6 +328,12 @@ async function saveMember(event) {
   }
 
   const member = payloadFromForm();
+  if (!Number.isSafeInteger(member.souls) || member.souls < 0) {
+  $('form-error').textContent =
+    'Количество Душ должно быть целым числом не меньше 0.';
+  $('form-error').hidden = false;
+  return;
+}
 
   if (!member.name) {
     $('form-error').textContent = 'Введите имя участника.';
