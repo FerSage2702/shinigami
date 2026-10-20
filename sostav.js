@@ -221,7 +221,7 @@ function renderDivision(division) {
       <section class="position-group">
         <h3 class="position-title">
           <span>${escapeHtml(position)}</span>
-          <small>${group.leng}</small>
+          
         </h3>
         <div class="table-scroll">
           <table class="roster-table">
