@@ -227,7 +227,7 @@ function renderDivision(division) {
           <table class="roster-table">
             <ead>
               <tr>
-                <>Имя</th>
+                <th>Имя</th>
                 <th>Ранг</th>
                 <th>Души</th>
                 <th>Steam ID</th>
