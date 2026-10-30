@@ -1,7 +1,7 @@
 
 /* URL проекта и публичный ключ Supabase */
 const SUPABASE_URL = 'https://rnppekauytrfgropgrlz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE';
+const SUPABASE_ANON_KEY = 'sb_publishable_XR57YxPL_g-y3ULfV7qWLQ_O6ogHWnu';
 
 const MANAGE_FUNCTION_URL = 'https://rnppekauytrfgropgrlz.supabase.co/functions/v1/manage-members';
 
