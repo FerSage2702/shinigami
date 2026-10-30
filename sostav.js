@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (
     window.supabase &&
     SUPABASE_URL === 'https://rnppekauytrfgropgrlz.supabase.co' &&
-    SUPABASE_ANON_KEY === 'sb_publishable_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
+    SUPABASE_ANON_KEY === '_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
   ) {
     supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
