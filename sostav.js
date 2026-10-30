@@ -434,16 +434,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (del) deleteMember(del.dataset.deleteId);
   });
 
-  if (
-    window.supabase &&
-    SUPABASE_URL === 'https://rnppekauytrfgropgrlz.supabase.co' &&
-    SUPABASE_ANON_KEY === '_Ji8uD6ZUynIsF93nyRdFcQ_OGRK24vE'
-  ) {
-    supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-  }
+  
+
+if (
+  window.supabase &&
+  SUPABASE_URL &&
+  SUPABASE_ANON_KEY
+) {
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+}
+
 
   updateAdminUI();
   loadMembers();
